@@ -1,0 +1,38 @@
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import userRoutes from "./routes/userRoutes.js";
+import bookRoutes from "./routes/bookRoutes.js";
+import borrowRoutes from "./routes/borrowRoutes.js";
+
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// static for uploaded covers
+app.use("/uploads", express.static("uploads"));
+
+app.use("/api/users", userRoutes);
+app.use("/api/books", bookRoutes);
+app.use("/api/borrow", borrowRoutes);
+
+// error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ message: err.message || "Server Error" });
+});
+
+const PORT = process.env.PORT || 5000;
+const MONGO = process.env.MONGO_URI;
+
+mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(() => {
+  console.log("MongoDB connected");
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+})
+.catch(err => {
+  console.error("DB connection error:", err);
+});
