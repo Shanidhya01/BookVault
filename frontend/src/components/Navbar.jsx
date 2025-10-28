@@ -18,7 +18,8 @@ export default function Navbar() {
       <div className="flex items-center gap-4 text-white font-medium">
         <Link to="/" className="hover:text-blue-200 transition">Books</Link>
         {user && <Link to="/borrowed" className="hover:text-blue-200 transition">My Borrowed</Link>}
-        {user && user.role === "admin" && <Link to="/admin/books" className="hover:text-blue-200 transition">Admin</Link>}
+        {user && user.role === "admin" && <Link to="/admin/books" className="hover:text-blue-200 transition">Add/Delete Book</Link>}
+        {user && user.role === "admin" && <Link to="/admin" className="hover:text-blue-200 transition">Admin</Link>}
         {user ? (
           <>
             <span className="ml-2 px-3 py-1 bg-white/10 rounded-full text-sm font-semibold">Hi, {user.name}</span>

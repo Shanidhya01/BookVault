@@ -14,19 +14,23 @@ export const createBook = async (req, res) => {
 };
 
 export const getBooks = async (req, res) => {
-  const { q, category } = req.query;
-  const filter = {};
-  if (q) {
-    filter.$or = [
-      { title: { $regex: q, $options: "i" } },
-      { author: { $regex: q, $options: "i" } },
-      { isbn: { $regex: q, $options: "i" } },
-    ];
+  try {
+    const { search, category, available } = req.query;
+    const filter = {};
+    if (search) {
+      const re = new RegExp(search, "i");
+      filter.$or = [{ title: re }, { author: re }, { isbn: re }];
+    }
+    if (category) filter.category = category;
+    if (available === "true") filter.availableCopies = { $gt: 0 };
+    // pagination optional: skip & limit
+    const books = await Book.find(filter).sort({ createdAt: -1 });
+    res.json(books);
+  } catch (err) {
+    console.error(err); res.status(500).json({ message: "Server error" });
   }
-  if (category) filter.category = category;
-  const books = await Book.find(filter).sort({ createdAt: -1 });
-  res.json(books);
 };
+
 
 export const getBookById = async (req, res) => {
   const book = await Book.findById(req.params.id);
