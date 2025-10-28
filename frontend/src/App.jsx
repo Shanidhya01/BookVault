@@ -8,6 +8,7 @@ import AdminBooks from "./pages/AdminBooks";
 import Dashboard from "./pages/Dashboard";
 import Borrowed from "./pages/Borrowed";
 import { useAuth } from "./context/AuthContext";
+import "./index.css";
 
 function PrivateRoute({ children, adminOnly }) {
   const { user } = useAuth();
