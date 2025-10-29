@@ -12,51 +12,110 @@ export default function Books() {
   const { user } = useAuth();
 
   const fetchBooks = async () => {
-    const res = await api.get("/books", { params: { search, category, available: "" }});
+    const res = await api.get("/books", {
+      params: { search, category, available: "" },
+    });
     setBooks(res.data);
   };
 
-  useEffect(() => { fetchBooks(); }, []);
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   const onSearch = () => fetchBooks();
 
-  // instead of immediate borrow, create a request
   const requestBorrow = async (bookId) => {
     try {
       await api.post(`/borrow/request/${bookId}`);
-      toast("Borrow request submitted. Wait for admin approval.");
+      toast("📚 Borrow request submitted! Wait for admin approval.", {
+        position: "top-center",
+      });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to request borrow");
+      toast.error(
+        err.response?.data?.message || "Failed to request borrow",
+        { position: "top-center" }
+      );
     }
   };
-  console.log(books);
 
   return (
-    <div>
-      <h2>Books</h2>
-      <SearchBar search={search} setSearch={setSearch} category={category} setCategory={setCategory} onSearch={onSearch} />
-      <div className="grid">
-        {books.map(b => (
-          <div className="book-card" key={b._id}>
-            {b.coverUrl && (
-              <img
-                src={b.coverUrl}
-                alt={b.title}
-                style={{ width: '120px', height: '160px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }}
-              />
-            )}
-            <h3>{b.title}</h3>
-            <p>{b.author}</p>
-            <p>Available: {b.availableCopies}/{b.totalCopies}</p>
-            {user ? (
-              <button className="btn" onClick={() => requestBorrow(b._id)} disabled={b.availableCopies < 1}>
-                Request Borrow
-              </button>
-            ) : (
-              <p className="muted">Login to request</p>
-            )}
-          </div>
-        ))}
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-white p-6">
+      <h2 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-blue-700 drop-shadow-sm">
+        Explore Books
+      </h2>
+
+      <div className="max-w-4xl mx-auto mb-8">
+        <SearchBar
+          search={search}
+          setSearch={setSearch}
+          category={category}
+          setCategory={setCategory}
+          onSearch={onSearch}
+        />
+      </div>
+
+      <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-items-center">
+        {books.length > 0 ? (
+          books.map((b) => (
+            <div
+              key={b._id}
+              className="relative bg-white/70 backdrop-blur-md shadow-lg hover:shadow-2xl border border-purple-200 rounded-2xl p-5 w-[220px] transition-all duration-300 hover:scale-105"
+            >
+              {b.coverUrl ? (
+                <img
+                  src={b.coverUrl}
+                  alt={b.title}
+                  className="w-full h-56 object-cover rounded-xl mb-4 shadow"
+                />
+              ) : (
+                <div className="w-full h-56 bg-gradient-to-r from-purple-200 to-blue-200 rounded-xl flex items-center justify-center text-gray-600 italic">
+                  No Cover
+                </div>
+              )}
+
+              <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
+                {b.title}
+              </h3>
+              <p className="text-sm text-gray-600 mb-1">{b.author}</p>
+              <p className="text-sm text-gray-700 mb-3">
+                Available:{" "}
+                <span
+                  className={`font-semibold ${
+                    b.availableCopies < 1
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {b.availableCopies}/{b.totalCopies}
+                </span>
+              </p>
+
+              {user ? (
+                <button
+                  onClick={() => requestBorrow(b._id)}
+                  disabled={b.availableCopies < 1}
+                  className={`w-full py-2 rounded-lg font-medium text-white shadow-md transition-all duration-300 ${
+                    b.availableCopies < 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-[1.03]"
+                  }`}
+                >
+                  {b.availableCopies < 1
+                    ? "Not Available"
+                    : "Request Borrow"}
+                </button>
+              ) : (
+                <p className="text-center text-sm text-gray-500 mt-2 italic">
+                  Login to request
+                </p>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="col-span-full text-center text-gray-600 text-lg">
+            No books found.
+          </p>
+        )}
       </div>
     </div>
   );

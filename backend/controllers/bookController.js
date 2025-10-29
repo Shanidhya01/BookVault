@@ -75,6 +75,6 @@ export const deleteBook = async (req, res) => {
     const filepath = path.join(process.cwd(), book.coverUrl);
     fs.unlink(filepath, (err) => { if (err) console.warn("Failed to delete cover", err); });
   }
-  await book.remove();
+  await book.deleteOne();
   res.json({ message: "Book removed" });
 };
