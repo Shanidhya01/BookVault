@@ -37,9 +37,7 @@ export default function AdminBooks() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-purple-100 to-blue-50 py-10 px-4">
       <h2 className="text-3xl font-bold text-purple-700 mb-8 text-center drop-shadow">Admin - Manage Books</h2>
-      <div className="flex justify-end mb-6">
-        <a href="/admin" className="btn bg-blue-500 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-600 transition">Go to Admin Dashboard</a>
-      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
         <form className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-5 border border-purple-100" onSubmit={submit}>
           <h3 className="text-xl font-semibold text-purple-600 mb-2">Add Book</h3>

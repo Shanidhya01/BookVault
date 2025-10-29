@@ -1,17 +1,17 @@
+// backend/controllers/borrowController.js
 import BorrowRecord from "../models/BorrowRecord.js";
 import Book from "../models/Book.js";
-import mongoose from "mongoose";
+import { sendMail } from "../utils/mailer.js";
 
 const FINE_PER_DAY = 10; // ₹10 per day
 
-// Student requests a borrow (creates pending record)
+// student requests
 export const requestBorrow = async (req, res) => {
   try {
     const bookId = req.params.bookId;
     const book = await Book.findById(bookId);
     if (!book) return res.status(404).json({ message: "Book not found" });
 
-    // optional: prevent duplicate pending requests for same user+book
     const exists = await BorrowRecord.findOne({ user: req.user._id, book: bookId, status: { $in: ["pending","approved","borrowed"] }});
     if (exists) return res.status(400).json({ message: "You already have an active request or borrowed this book" });
 
@@ -28,7 +28,7 @@ export const requestBorrow = async (req, res) => {
   }
 };
 
-// Admin lists pending requests
+// admin lists pending
 export const listPendingRequests = async (req, res) => {
   try {
     const records = await BorrowRecord.find({ status: "pending" }).populate("book").populate("user").sort({ requestedAt: -1 });
@@ -38,19 +38,18 @@ export const listPendingRequests = async (req, res) => {
   }
 };
 
-// Admin approve request: set approvedAt, status->approved->borrowed, set borrowDate/dueDate and decrement book avail
+// approve request (admin)
 export const approveRequest = async (req, res) => {
   try {
     const id = req.params.requestId;
-    const record = await BorrowRecord.findById(id);
+    const record = await BorrowRecord.findById(id).populate("user").populate("book");
     if (!record) return res.status(404).json({ message: "Request not found" });
     if (record.status !== "pending") return res.status(400).json({ message: "Request is not pending" });
 
-    const book = await Book.findById(record.book);
+    const book = await Book.findById(record.book._id);
     if (!book) return res.status(404).json({ message: "Book not found" });
     if (book.availableCopies < 1) return res.status(400).json({ message: "No copies available to approve" });
 
-    // mark approved & borrowed
     const now = new Date();
     record.status = "borrowed";
     record.approvedAt = now;
@@ -59,10 +58,21 @@ export const approveRequest = async (req, res) => {
     dueDate.setDate(dueDate.getDate() + 14);
     record.dueDate = dueDate;
 
-    // decrement book available copies
     book.availableCopies -= 1;
     await book.save();
-  await record.save();
+    await record.save();
+
+    // send email to student - approval notification
+    try {
+      await sendMail({
+        to: record.user.email,
+        subject: `Borrow request approved: ${record.book.title}`,
+        text: `Hello ${record.user.name},\n\nYour request to borrow "${record.book.title}" has been approved. Due date: ${record.dueDate.toDateString()}.\n\nRegards,\nBookVault`,
+        html: `<p>Hello ${record.user.name},</p><p>Your request to borrow "<strong>${record.book.title}</strong>" has been <strong>approved</strong>.</p><p>Due date: ${record.dueDate.toDateString()}</p><p>Regards,<br/>BookVault</p>`
+      });
+    } catch (mailErr) {
+      console.warn("Failed to send approval email:", mailErr.message);
+    }
 
   // Use single populate with array for multiple fields
   const populated = await record.populate(["book", "user"]);
@@ -72,24 +82,36 @@ export const approveRequest = async (req, res) => {
   }
 };
 
-// Admin reject request
+// reject request (admin)
 export const rejectRequest = async (req, res) => {
   try {
     const id = req.params.requestId;
-    const record = await BorrowRecord.findById(id);
+    const record = await BorrowRecord.findById(id).populate("user").populate("book");
     if (!record) return res.status(404).json({ message: "Request not found" });
     if (record.status !== "pending") return res.status(400).json({ message: "Request is not pending" });
 
     record.status = "rejected";
     record.rejectedAt = new Date();
     await record.save();
+
+    try {
+      await sendMail({
+        to: record.user.email,
+        subject: `Borrow request rejected: ${record.book.title}`,
+        text: `Hello ${record.user.name},\n\nYour request to borrow "${record.book.title}" was rejected by the admin.\n\nRegards,\nBookVault`,
+        html: `<p>Hello ${record.user.name},</p><p>Your request to borrow "<strong>${record.book.title}</strong>" was <strong>rejected</strong>.</p><p>Regards,<br/>BookVault</p>`
+      });
+    } catch (mailErr) {
+      console.warn("Failed to send rejection email:", mailErr.message);
+    }
+
     res.json(record);
   } catch (err) {
     console.error(err); res.status(500).json({ message: "Server error" });
   }
 };
 
-// User returns book: calculate fine, update book.availableCopies
+// return book (student or admin)
 export const returnBook = async (req, res) => {
   try {
     const recordId = req.params.recordId;
@@ -101,7 +123,6 @@ export const returnBook = async (req, res) => {
     record.returnDate = now;
     record.status = "returned";
 
-    // calculate fine if overdue
     let fine = 0;
     if (record.dueDate && now > record.dueDate) {
       const diffMs = now - record.dueDate;
@@ -110,7 +131,7 @@ export const returnBook = async (req, res) => {
     }
     record.fine = fine;
 
-    // increment book availableCopies (cap at totalCopies)
+    // increment book availability
     const book = await Book.findById(record.book._id);
     if (book) {
       book.availableCopies = Math.min(book.totalCopies, (book.availableCopies || 0) + 1);
@@ -118,13 +139,27 @@ export const returnBook = async (req, res) => {
     }
 
     await record.save();
+
+    // send return confirmation / fine notice email
+    try {
+      await sendMail({
+        to: record.user.email,
+        subject: `Book returned: ${record.book.title}`,
+        text: `Hello ${record.user.name},\n\nYou returned "${record.book.title}". Fine: ₹${fine}.\n\nRegards,\nBookVault`,
+        html: `<p>Hello ${record.user.name},</p><p>You returned "<strong>${record.book.title}</strong>".</p><p>Fine: <strong>₹${fine}</strong></p><p>Regards,<br/>BookVault</p>`
+      });
+    } catch (mailErr) {
+      console.warn("Failed to send return email:", mailErr.message);
+    }
+
     res.json({ record, fine });
   } catch (err) {
     console.error(err); res.status(500).json({ message: "Server error" });
   }
 };
 
-// Get borrow records for current user (student) — includes overdue flag and fine recalculated on-the-fly
+
+// get user records (student)
 export const getUserRecords = async (req, res) => {
   try {
     const records = await BorrowRecord.find({ user: req.user._id }).populate("book").sort({ borrowDate: -1 });
@@ -144,41 +179,97 @@ export const getUserRecords = async (req, res) => {
   }
 };
 
-// Admin: all borrow records (with filters)
+// admin: all records (with pagination & filters)
 export const getAllRecords = async (req, res) => {
   try {
-    const { userName, bookTitle, status } = req.query;
+    const { userName, bookTitle, status, page = 1, limit = 20 } = req.query;
     const filter = {};
     if (status) filter.status = status;
 
-    let query = BorrowRecord.find(filter).populate("user", "name email").populate("book", "title author isbn");
-    // basic text filters:
-    // if userName or bookTitle provided, we can filter in-memory after populate
-    const records = await query.sort({ createdAt: -1 });
-    let results = records;
-    if (userName) {
-      results = results.filter(r => r.user && r.user.name.toLowerCase().includes(userName.toLowerCase()));
-    }
-    if (bookTitle) {
-      results = results.filter(r => r.book && r.book.title.toLowerCase().includes(bookTitle.toLowerCase()));
-    }
+    // basic query (no text search across refs), we'll populate then filter text fields in-memory
+    const skip = (Number(page) - 1) * Number(limit);
+    const total = await BorrowRecord.countDocuments(filter);
+    let query = BorrowRecord.find(filter).populate("user", "name email").populate("book", "title author isbn").sort({ createdAt: -1 }).skip(skip).limit(Number(limit));
+    let records = await query.exec();
 
-    // recalc fines if currently overdue
+    // text filters
+    if (userName) records = records.filter(r => r.user && r.user.name.toLowerCase().includes(userName.toLowerCase()));
+    if (bookTitle) records = records.filter(r => r.book && r.book.title.toLowerCase().includes(bookTitle.toLowerCase()));
+
+    // enrich with currentFine & isOverdue
     const now = new Date();
-    results = results.map(r => {
+    const enriched = records.map(r => {
       const obj = r.toObject();
       obj.isOverdue = obj.status === "borrowed" && obj.dueDate && now > new Date(obj.dueDate);
       if (obj.isOverdue) {
         const daysLate = Math.ceil((now - new Date(obj.dueDate)) / (1000 * 60 * 60 * 24));
         obj.currentFine = daysLate * FINE_PER_DAY;
-      } else {
-        obj.currentFine = obj.fine || 0;
-      }
+      } else obj.currentFine = obj.fine || 0;
       return obj;
     });
 
-    res.json(results);
+    res.json({
+      page: Number(page),
+      limit: Number(limit),
+      total,
+      totalPages: Math.ceil(total / Number(limit)),
+      data: enriched
+    });
   } catch (err) {
     console.error(err); res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+/*
+  Helper: scanAndNotifyOverdues
+  - Finds borrowed records whose dueDate < now and that haven't been notified today (overdueNotifiedAt)
+  - Calculates fine (updates record.fine to currentFine)
+  - Sends email reminder to user
+  - Updates overdueNotifiedAt to now
+*/
+export const scanAndNotifyOverdues = async () => {
+  try {
+    const now = new Date();
+    // find borrowed records with dueDate in past and not already notified today
+    const candidates = await BorrowRecord.find({
+      status: "borrowed",
+      dueDate: { $lt: now }
+    }).populate("user").populate("book");
+
+    for (const rec of candidates) {
+      // detect last notified date (avoid multiple sends per day)
+      const lastNotified = rec.overdueNotifiedAt ? new Date(rec.overdueNotifiedAt) : null;
+      const lastNotifiedDay = lastNotified ? lastNotified.toDateString() : null;
+      if (lastNotifiedDay === now.toDateString()) {
+        // already notified today
+        continue;
+      }
+
+      // compute current fine
+      const daysLate = Math.ceil((now - rec.dueDate) / (1000 * 60 * 60 * 24));
+      const currentFine = daysLate * FINE_PER_DAY;
+      rec.fine = currentFine;
+
+      // set notifiedAt to now
+      rec.overdueNotifiedAt = now;
+      await rec.save();
+
+      // send email
+      try {
+        await sendMail({
+          to: rec.user.email,
+          subject: `Overdue reminder: ${rec.book.title}`,
+          text: `Hello ${rec.user.name},\n\nYour borrowed book "${rec.book.title}" is overdue by ${daysLate} day(s). Current fine: ₹${currentFine}.\nPlease return the book as soon as possible to avoid further fines.\n\nRegards,\nBookVault`,
+          html: `<p>Hello ${rec.user.name},</p><p>Your borrowed book "<strong>${rec.book.title}</strong>" is overdue by <strong>${daysLate}</strong> day(s).</p><p>Current fine: <strong>₹${currentFine}</strong></p><p>Please return the book to avoid further fines.</p><p>Regards,<br/>BookVault</p>`
+        });
+      } catch (mailErr) {
+        console.warn("Failed to send overdue email:", mailErr.message);
+      }
+    }
+    return { processed: candidates.length };
+  } catch (err) {
+    console.error("scanAndNotifyOverdues error:", err);
+    return { processed: 0, error: err.message };
   }
 };

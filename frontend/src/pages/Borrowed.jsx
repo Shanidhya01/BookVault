@@ -1,7 +1,7 @@
-// frontend/src/pages/Borrowed.jsx
 import React, { useEffect, useState } from "react";
 import api from "../api";
 import Navbar from "../components/Navbar";
+import FinesWidget from "../components/FinesWidget";
 
 export default function Borrowed() {
   const [records, setRecords] = useState([]);
@@ -24,6 +24,7 @@ export default function Borrowed() {
     <div>
       {/* <Navbar /> */}
       <div className="container p-6">
+        <FinesWidget />
         <h2>My Borrow History</h2>
         {records.length === 0 ? <p>No records</p> :
           records.map(r => (

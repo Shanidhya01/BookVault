@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import borrowRoutes from "./routes/borrowRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import { startOverdueScheduler } from "./scheduler/overdueSchedular.js";
 
 dotenv.config();
 
@@ -34,6 +35,8 @@ mongoose.connect(MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
   console.log("MongoDB connected");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  // Start the overdue scheduler
+  startOverdueScheduler();
 })
 .catch(err => {
   console.error("DB connection error:", err);
