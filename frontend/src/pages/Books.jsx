@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
 import SearchBar from "../components/SearchBar";
+import { toast } from "react-toastify";
 
 export default function Books() {
   const [books, setBooks] = useState([]);
@@ -23,11 +24,12 @@ export default function Books() {
   const requestBorrow = async (bookId) => {
     try {
       await api.post(`/borrow/request/${bookId}`);
-      alert("Borrow request submitted. Wait for admin approval.");
+      toast("Borrow request submitted. Wait for admin approval.");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to request borrow");
+      toast.error(err.response?.data?.message || "Failed to request borrow");
     }
   };
+  console.log(books);
 
   return (
     <div>
@@ -36,6 +38,13 @@ export default function Books() {
       <div className="grid">
         {books.map(b => (
           <div className="book-card" key={b._id}>
+            {b.coverUrl && (
+              <img
+                src={b.coverUrl}
+                alt={b.title}
+                style={{ width: '120px', height: '160px', objectFit: 'cover', borderRadius: '8px', marginBottom: '8px' }}
+              />
+            )}
             <h3>{b.title}</h3>
             <p>{b.author}</p>
             <p>Available: {b.availableCopies}/{b.totalCopies}</p>

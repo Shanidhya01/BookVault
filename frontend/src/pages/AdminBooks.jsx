@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
+import { toast } from "react-toastify";
 
 export default function AdminBooks() {
   const [books, setBooks] = useState([]);
@@ -23,8 +24,9 @@ export default function AdminBooks() {
       setForm({ title: "", author: "", category: "", isbn: "", totalCopies: 1 });
       setFile(null);
       load();
+      toast("Book added successfully");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed");
+      toast.error(err.response?.data?.message || "Failed");
     }
   };
 

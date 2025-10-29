@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api";
 import Navbar from "../components/Navbar";
 import FinesWidget from "../components/FinesWidget";
+import { toast } from "react-toastify";
 
 export default function Borrowed() {
   const [records, setRecords] = useState([]);
@@ -16,7 +17,7 @@ export default function Borrowed() {
   const doReturn = async (id) => {
     if (!confirm("Return this book?")) return;
     const res = await api.put(`/borrow/${id}/return`);
-    alert(`Returned. Fine: ₹${res.data.fine}`);
+    toast(`Returned. Fine: ₹${res.data.fine}`);
     load();
   };
 
@@ -31,7 +32,7 @@ export default function Borrowed() {
             <div key={r._id} className="card mb-2">
               <div className="flex justify-between">
                 <div>
-                  <strong>{r.book.title}</strong>
+                  <strong>{r.title}</strong>
                   <div>Borrowed: {r.borrowDate ? new Date(r.borrowDate).toLocaleString() : "N/A"}</div>
                   <div>Due: {r.dueDate ? new Date(r.dueDate).toLocaleDateString() : "N/A"}</div>
                 </div>

@@ -4,7 +4,8 @@ import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Books from "./pages/Books";
-// import AdminBooks from "./pages/AdminBooks";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Dashboard from "./pages/Dashboard";
 import Borrowed from "./pages/Borrowed";
 import { useAuth } from "./context/AuthContext";
@@ -73,6 +74,7 @@ export default function App() {
 
           <Route path="*" element={<h2>Page not found</h2>} />
         </Routes>
+        <ToastContainer position="top-right" autoClose={3000} />
       </main>
     </div>
   );

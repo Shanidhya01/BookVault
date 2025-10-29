@@ -132,7 +132,7 @@ export const returnBook = async (req, res) => {
     record.fine = fine;
 
     // increment book availability
-    const book = await Book.findById(record.book._id);
+    const book = record.book ? await Book.findById(record.book._id) : null;
     if (book) {
       book.availableCopies = Math.min(book.totalCopies, (book.availableCopies || 0) + 1);
       await book.save();
@@ -163,6 +163,7 @@ export const returnBook = async (req, res) => {
 export const getUserRecords = async (req, res) => {
   try {
     const records = await BorrowRecord.find({ user: req.user._id }).populate("book").sort({ borrowDate: -1 });
+    const book = records.book ? await Book.findById(records.book._id) : null;
     const now = new Date();
     const enriched = records.map(rec => {
       const isOverdue = rec.status === "borrowed" && rec.dueDate && now > rec.dueDate;
@@ -256,16 +257,16 @@ export const scanAndNotifyOverdues = async () => {
       await rec.save();
 
       // send email
-      try {
-        await sendMail({
-          to: rec.user.email,
-          subject: `Overdue reminder: ${rec.book.title}`,
-          text: `Hello ${rec.user.name},\n\nYour borrowed book "${rec.book.title}" is overdue by ${daysLate} day(s). Current fine: ₹${currentFine}.\nPlease return the book as soon as possible to avoid further fines.\n\nRegards,\nBookVault`,
-          html: `<p>Hello ${rec.user.name},</p><p>Your borrowed book "<strong>${rec.book.title}</strong>" is overdue by <strong>${daysLate}</strong> day(s).</p><p>Current fine: <strong>₹${currentFine}</strong></p><p>Please return the book to avoid further fines.</p><p>Regards,<br/>BookVault</p>`
-        });
-      } catch (mailErr) {
-        console.warn("Failed to send overdue email:", mailErr.message);
-      }
+    try {
+      await sendMail({
+        to: record.user.email,
+        subject: `Book returned: ${record.book ? record.book.title : "Unknown Book"}`,
+        text: `Hello ${record.user.name},\n\nYou returned \"${record.book ? record.book.title : "Unknown Book"}\". Fine: ₹${fine}.\n\nRegards,\nBookVault`,
+        html: `<p>Hello ${record.user.name},</p><p>You returned \"<strong>${record.book ? record.book.title : "Unknown Book"}</strong>\".</p><p>Fine: <strong>₹${fine}</strong></p><p>Regards,<br/>BookVault</p>`
+      });
+    } catch (mailErr) {
+      console.warn("Failed to send return email:", mailErr.message);
+    }
     }
     return { processed: candidates.length };
   } catch (err) {

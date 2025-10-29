@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
 import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({});
@@ -38,9 +39,9 @@ export default function AdminDashboard() {
       loadPending();
       loadAllRecords();
       loadStats();
-      alert("Approved");
+      toast("Approved");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed");
+      toast.error(err.response?.data?.message || "Failed");
     }
   };
 
@@ -50,9 +51,9 @@ export default function AdminDashboard() {
       loadPending();
       loadAllRecords();
       loadStats();
-      alert("Rejected");
+      toast("Rejected");
     } catch (err) {
-      alert(err.response?.data?.message || "Failed");
+      toast.error(err.response?.data?.message || "Failed");
     }
   };
 
