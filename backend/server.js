@@ -11,8 +11,9 @@ import { startOverdueScheduler } from "./scheduler/overdueSchedular.js";
 
 dotenv.config();
 
+
 const app = express();
-app.use(cors());
+app.use(cors({ origin: "https://book-vault-swart.vercel.app" }));
 app.use(express.json());
 
 
