@@ -15,8 +15,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 // static for uploaded covers
 app.use("/uploads", express.static("uploads"));
+
+// Serve React frontend build
+import path from "path";
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+app.get("/*", (req, res) => {
+  // If not an API route, serve index.html
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+  }
+});
 
 app.use("/api/users", userRoutes);
 app.use("/api/books", bookRoutes);
