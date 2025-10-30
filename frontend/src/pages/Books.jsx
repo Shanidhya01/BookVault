@@ -31,25 +31,26 @@ export default function Books() {
         position: "top-center",
       });
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Failed to request borrow",
-        { position: "top-center" }
-      );
+      toast.error(err.response?.data?.message || "Failed to request borrow", {
+        position: "top-center",
+      });
     }
   };
 
   const notifyMe = async (bookId) => {
     try {
       await api.post(`/books/${bookId}/waitlist`);
-      toast.success("You will be notified when this book is available.", { position: "top-center" });
+      toast.success("You will be notified when this book is available.", {
+        position: "top-center",
+      });
     } catch (err) {
       toast.error("Failed to join waitlist", { position: "top-center" });
     }
   };
 
   return (
-  <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-white p-6">
-  <h2 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-linear-to-r from-purple-700 to-blue-700 drop-shadow-sm">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-white p-6">
+      <h2 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-linear-to-r from-purple-700 to-blue-700 drop-shadow-sm">
         Explore Books
       </h2>
 
@@ -90,9 +91,7 @@ export default function Books() {
                 Available:{" "}
                 <span
                   className={`font-semibold ${
-                    b.availableCopies < 1
-                      ? "text-red-600"
-                      : "text-green-600"
+                    b.availableCopies < 1 ? "text-red-600" : "text-green-600"
                   }`}
                 >
                   {b.availableCopies}/{b.totalCopies}
@@ -110,9 +109,7 @@ export default function Books() {
                         : "bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-[1.03]"
                     }`}
                   >
-                    {b.availableCopies < 1
-                      ? "Not Available"
-                      : "Request Borrow"}
+                    {b.availableCopies < 1 ? "Not Available" : "Request Borrow"}
                   </button>
                   {b.availableCopies < 1 && (
                     <button

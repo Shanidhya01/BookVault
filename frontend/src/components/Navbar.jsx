@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { BookOpen, Menu, X } from "lucide-react"; // install: npm i lucide-react
+import { BookOpen, Menu, X } from "lucide-react"; 
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -19,7 +19,7 @@ export default function Navbar() {
   return (
     <>
       {/* NAVBAR */}
-  <nav className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-r from-purple-700/70 via-blue-700/60 to-purple-700/70 border-b border-white/20 shadow-lg px-6 py-3 flex items-center justify-between">
+      <nav className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-r from-purple-700/70 via-blue-700/60 to-purple-700/70 border-b border-white/20 shadow-lg px-6 py-3 flex items-center justify-between">
         {/* Brand Section */}
         <div className="flex items-center gap-3">
           <BookOpen className="text-white drop-shadow-md w-7 h-7" />
@@ -48,8 +48,12 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {menuOpen && (
-  <div className="md:hidden absolute top-[60px] left-0 w-full bg-linear-to-b from-purple-800/95 to-blue-800/95 backdrop-blur-md text-white flex flex-col items-center py-4 gap-3 border-b border-white/20 z-40">
-          <NavLinks user={user} setShowPopup={setShowPopup} closeMenu={() => setMenuOpen(false)} />
+        <div className="md:hidden absolute top-[60px] left-0 w-full bg-linear-to-b from-purple-800/95 to-blue-800/95 backdrop-blur-md text-white flex flex-col items-center py-4 gap-3 border-b border-white/20 z-40">
+          <NavLinks
+            user={user}
+            setShowPopup={setShowPopup}
+            closeMenu={() => setMenuOpen(false)}
+          />
           <ThemeToggle />
         </div>
       )}
@@ -146,7 +150,7 @@ function NavLink({ to, children, closeMenu }) {
       className="relative group transition text-white/90 hover:text-white font-medium"
     >
       {children}
-  <span className="absolute left-0 bottom-[-3px] w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+      <span className="absolute left-0 bottom-[-3px] w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
     </Link>
   );
 }

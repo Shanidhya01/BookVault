@@ -15,10 +15,11 @@ export default function ThemeToggle() {
 
   return (
     <button
-      className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow"
+      // className="px-4 py-2 rounded bg-gray-200 dark:bg-purple-700 text-purple-800 dark:text-gray-100 shadow"
+      className="text-2xl"
       onClick={() => setDark((d) => !d)}
     >
-      {dark ? "🌙 Dark Mode" : "☀️ Light Mode"}
+      {dark ? "🌙 " : "☀️ "}
     </button>
   );
 }

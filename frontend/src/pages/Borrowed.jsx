@@ -30,7 +30,9 @@ export default function Borrowed() {
   const confirmReturn = async () => {
     if (!selectedRecord) return;
     const res = await api.put(`/borrow/${selectedRecord._id}/return`);
-    toast.success(`Returned. Fine: ₹${res.data.fine}`, { position: "top-center" });
+    toast.success(`Returned. Fine: ₹${res.data.fine}`, {
+      position: "top-center",
+    });
     closePopup();
     load();
   };
@@ -45,7 +47,9 @@ export default function Borrowed() {
         </h2>
 
         {records.length === 0 ? (
-          <p className="text-center text-gray-600 text-lg">No borrowed books yet.</p>
+          <p className="text-center text-gray-600 text-lg">
+            No borrowed books yet.
+          </p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {records.map((r) => (
@@ -55,17 +59,23 @@ export default function Borrowed() {
               >
                 <div className="flex flex-col justify-between h-full">
                   <div>
-                    <h3 className="text-xl font-semibold text-purple-700">{r.title}</h3>
+                    <h3 className="text-xl font-semibold text-purple-700">
+                      {r.title}
+                    </h3>
                     <p className="text-gray-600 mt-1">
                       Borrowed:{" "}
                       <span className="font-medium text-gray-800">
-                        {r.borrowDate ? new Date(r.borrowDate).toLocaleDateString() : "N/A"}
+                        {r.borrowDate
+                          ? new Date(r.borrowDate).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </p>
                     <p className="text-gray-600">
                       Due:{" "}
                       <span className="font-medium text-gray-800">
-                        {r.dueDate ? new Date(r.dueDate).toLocaleDateString() : "N/A"}
+                        {r.dueDate
+                          ? new Date(r.dueDate).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </p>
                   </div>
@@ -116,10 +126,15 @@ export default function Borrowed() {
       {showPopup && selectedRecord && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 animate-fadeIn">
           <div className="bg-white/90 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-[90%] max-w-md text-center border border-purple-100 animate-scaleIn">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Confirm Return</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              Confirm Return
+            </h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to return{" "}
-              <span className="font-semibold text-purple-700">{selectedRecord.title}</span>?
+              <span className="font-semibold text-purple-700">
+                {selectedRecord.title}
+              </span>
+              ?
             </p>
             <div className="flex justify-center gap-4">
               <button
