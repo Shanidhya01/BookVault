@@ -13,6 +13,7 @@ import "./index.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminBooks from "./pages/AdminBooks";
+import AdminSettings from "./pages/AdminSettings";
 
 function PrivateRoute({ children, adminOnly }) {
   const { user } = useAuth();
@@ -54,6 +55,14 @@ export default function App() {
               </PrivateRoute>
             }
           />
+            <Route
+              path="/admin/settings"
+              element={
+                <PrivateRoute adminOnly={true}>
+                  <AdminSettings />
+                </PrivateRoute>
+              }
+            />
           <Route path="/books" element={<Books />} />
           <Route
             path="/borrowed"

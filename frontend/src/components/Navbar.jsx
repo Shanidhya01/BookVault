@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { BookOpen, Menu, X } from "lucide-react"; // install: npm i lucide-react
@@ -18,13 +19,13 @@ export default function Navbar() {
   return (
     <>
       {/* NAVBAR */}
-      <nav className="sticky top-0 z-50 backdrop-blur-md bg-gradient-to-r from-purple-700/70 via-blue-700/60 to-purple-700/70 border-b border-white/20 shadow-lg px-6 py-3 flex items-center justify-between">
+  <nav className="sticky top-0 z-50 backdrop-blur-md bg-linear-to-r from-purple-700/70 via-blue-700/60 to-purple-700/70 border-b border-white/20 shadow-lg px-6 py-3 flex items-center justify-between">
         {/* Brand Section */}
         <div className="flex items-center gap-3">
           <BookOpen className="text-white drop-shadow-md w-7 h-7" />
           <Link
             to="/"
-            className="text-2xl font-extrabold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent tracking-wide drop-shadow-sm"
+            className="text-2xl font-extrabold bg-linear-to-r from-white to-blue-200 bg-clip-text text-transparent tracking-wide drop-shadow-sm"
           >
             BookVault
           </Link>
@@ -33,6 +34,7 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6 text-white font-medium">
           <NavLinks user={user} setShowPopup={setShowPopup} />
+          <ThemeToggle />
         </div>
 
         {/* Mobile Menu Button */}
@@ -46,8 +48,9 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {menuOpen && (
-        <div className="md:hidden absolute top-[60px] left-0 w-full bg-gradient-to-b from-purple-800/95 to-blue-800/95 backdrop-blur-md text-white flex flex-col items-center py-4 gap-3 border-b border-white/20 z-40">
+  <div className="md:hidden absolute top-[60px] left-0 w-full bg-linear-to-b from-purple-800/95 to-blue-800/95 backdrop-blur-md text-white flex flex-col items-center py-4 gap-3 border-b border-white/20 z-40">
           <NavLinks user={user} setShowPopup={setShowPopup} closeMenu={() => setMenuOpen(false)} />
+          <ThemeToggle />
         </div>
       )}
 
@@ -63,7 +66,7 @@ export default function Navbar() {
             </p>
             <div className="flex justify-center gap-4">
               <button
-                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:scale-105 transition"
+                className="bg-linear-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-medium shadow-md hover:scale-105 transition"
                 onClick={confirmLogout}
               >
                 Yes, Logout
@@ -111,7 +114,7 @@ function NavLinks({ user, setShowPopup, closeMenu }) {
             Hi, {user.name}
           </span>
           <button
-            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-1.5 px-5 rounded-xl shadow-lg hover:shadow-purple-300/40 transition-all duration-300 hover:scale-105 ml-2"
+            className="bg-linear-to-r from-purple-500 to-blue-500 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-1.5 px-5 rounded-xl shadow-lg hover:shadow-purple-300/40 transition-all duration-300 hover:scale-105 ml-2"
             onClick={() => {
               setShowPopup(true);
               closeMenu && closeMenu();
@@ -143,7 +146,7 @@ function NavLink({ to, children, closeMenu }) {
       className="relative group transition text-white/90 hover:text-white font-medium"
     >
       {children}
-      <span className="absolute left-0 bottom-[-3px] w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+  <span className="absolute left-0 bottom-[-3px] w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
     </Link>
   );
 }

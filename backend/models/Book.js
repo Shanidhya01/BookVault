@@ -7,7 +7,8 @@ const bookSchema = new mongoose.Schema({
   isbn: { type: String },
   totalCopies: { type: Number, default: 1 },
   availableCopies: { type: Number, default: 1 },
-  coverUrl: { type: String }
+  coverUrl: { type: String },
+  waitlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 }, { timestamps: true });
 
 export default mongoose.model("Book", bookSchema);

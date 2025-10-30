@@ -2,6 +2,7 @@
 import BorrowRecord from "../models/BorrowRecord.js";
 import Book from "../models/Book.js";
 import { sendMail } from "../utils/mailer.js";
+import { notifyWaitlistOnReturn } from "./bookController.js";
 
 const FINE_PER_DAY = 10; // ₹10 per day
 
@@ -136,6 +137,7 @@ export const returnBook = async (req, res) => {
     if (book) {
       book.availableCopies = Math.min(book.totalCopies, (book.availableCopies || 0) + 1);
       await book.save();
+      await notifyWaitlistOnReturn(book);
     }
 
     await record.save();

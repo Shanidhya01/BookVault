@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import Navbar from "../components/Navbar";
 import { toast } from "react-toastify";
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const loadAllRecords = async (p = 1) => {
     const res = await api.get("/borrow", { params: { page: p, limit: 10 } });
@@ -87,6 +89,14 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* <Navbar /> */}
       <div className="container mx-auto p-6">
+        <div className="flex justify-end mb-4">
+          <button
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition"
+            onClick={() => navigate("/admin/settings")}
+          >
+            Library Rules & Settings
+          </button>
+        </div>
         <h1 className="text-3xl font-bold mb-6 text-gray-800">
           📊 Admin Dashboard
         </h1>

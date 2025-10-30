@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import borrowRoutes from "./routes/borrowRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 import { startOverdueScheduler } from "./scheduler/overdueSchedular.js";
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/borrow", borrowRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin/settings", settingsRoutes);
 
 // error handler
 app.use((err, req, res, next) => {

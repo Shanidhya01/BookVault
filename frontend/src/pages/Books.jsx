@@ -38,9 +38,18 @@ export default function Books() {
     }
   };
 
+  const notifyMe = async (bookId) => {
+    try {
+      await api.post(`/books/${bookId}/waitlist`);
+      toast.success("You will be notified when this book is available.", { position: "top-center" });
+    } catch (err) {
+      toast.error("Failed to join waitlist", { position: "top-center" });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-white p-6">
-      <h2 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-blue-700 drop-shadow-sm">
+  <div className="min-h-screen bg-linear-to-br from-purple-50 via-blue-50 to-white p-6">
+  <h2 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-linear-to-r from-purple-700 to-blue-700 drop-shadow-sm">
         Explore Books
       </h2>
 
@@ -68,7 +77,7 @@ export default function Books() {
                   className="w-full h-56 object-cover rounded-xl mb-4 shadow"
                 />
               ) : (
-                <div className="w-full h-56 bg-gradient-to-r from-purple-200 to-blue-200 rounded-xl flex items-center justify-center text-gray-600 italic">
+                <div className="w-full h-56 bg-linear-to-r from-purple-200 to-blue-200 rounded-xl flex items-center justify-center text-gray-600 italic">
                   No Cover
                 </div>
               )}
@@ -91,19 +100,29 @@ export default function Books() {
               </p>
 
               {user ? (
-                <button
-                  onClick={() => requestBorrow(b._id)}
-                  disabled={b.availableCopies < 1}
-                  className={`w-full py-2 rounded-lg font-medium text-white shadow-md transition-all duration-300 ${
-                    b.availableCopies < 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-[1.03]"
-                  }`}
-                >
-                  {b.availableCopies < 1
-                    ? "Not Available"
-                    : "Request Borrow"}
-                </button>
+                <>
+                  <button
+                    onClick={() => requestBorrow(b._id)}
+                    disabled={b.availableCopies < 1}
+                    className={`w-full py-2 rounded-lg font-medium text-white shadow-md transition-all duration-300 ${
+                      b.availableCopies < 1
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-[1.03]"
+                    }`}
+                  >
+                    {b.availableCopies < 1
+                      ? "Not Available"
+                      : "Request Borrow"}
+                  </button>
+                  {b.availableCopies < 1 && (
+                    <button
+                      onClick={() => notifyMe(b._id)}
+                      className="w-full mt-2 py-2 rounded-lg font-medium text-white bg-yellow-500 hover:bg-yellow-600 shadow-md transition-all duration-300"
+                    >
+                      Notify Me When Available
+                    </button>
+                  )}
+                </>
               ) : (
                 <p className="text-center text-sm text-gray-500 mt-2 italic">
                   Login to request

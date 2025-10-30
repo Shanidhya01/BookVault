@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { protect, admin } from "../middleware/authMiddleware.js";
-import { getBooks, createBook, getBookById, updateBook, deleteBook } from "../controllers/bookController.js";
+import { getBooks, createBook, getBookById, updateBook, deleteBook, addToWaitlist } from "../controllers/bookController.js";
 import path from "path";
 
 const router = express.Router();
@@ -20,5 +20,6 @@ router.get("/:id", getBookById);
 router.post("/", protect, admin, upload.single("cover"), createBook);
 router.put("/:id", protect, admin, upload.single("cover"), updateBook);
 router.delete("/:id", protect, admin, deleteBook);
+router.post("/:id/waitlist", protect, addToWaitlist);
 
 export default router;

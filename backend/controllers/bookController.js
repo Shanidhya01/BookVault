@@ -1,3 +1,29 @@
+// Add user to book waitlist
+export const addToWaitlist = async (req, res) => {
+  const book = await Book.findById(req.params.id);
+  if (!book) return res.status(404).json({ message: "Book not found" });
+  if (!book.waitlist) book.waitlist = [];
+  if (book.waitlist.includes(req.user._id)) return res.status(400).json({ message: "Already in waitlist" });
+  book.waitlist.push(req.user._id);
+  await book.save();
+  res.json({ message: "Added to waitlist" });
+};
+
+// Notify first user in waitlist when book is returned
+export const notifyWaitlistOnReturn = async (book) => {
+  if (book.waitlist && book.waitlist.length > 0) {
+    const nextUserId = book.waitlist.shift();
+    const nextUser = await import("../models/User.js").then(m => m.default.findById(nextUserId));
+    if (nextUser) {
+      await import("../utils/mailer.js").then(m => m.sendMail({
+        to: nextUser.email,
+        subject: `Book now available: ${book.title}`,
+        text: `The book \"${book.title}\" is now available for borrowing.`
+      }));
+    }
+    await book.save();
+  }
+};
 import Book from "../models/Book.js";
 import fs from "fs";
 import path from "path";
