@@ -24,11 +24,8 @@ import path from "path";
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-app.get("/*", (req, res) => {
-  // If not an API route, serve index.html
-  if (!req.path.startsWith("/api")) {
-    res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
-  }
+app.get("/", (req, res) => {
+  res.send("Backend server is running ✅");
 });
 
 app.use("/api/users", userRoutes);
