@@ -3,15 +3,37 @@
   --card: #fff;
   --accent: #2563eb;
 }
+/* Dark theme variables applied when html has .dark (set by ThemeToggle) */
+html.dark {
+  --bg: #0b1020; /* deep slate background */
+  --card: #111827; /* slate-900 card */
+}
 body {
   font-family: Inter, system-ui, Arial;
   background: var(--bg);
   margin: 0;
+  color: #111; /* default for light */
+}
+/* Ensure body text/background switch in dark mode */
+html.dark body {
+  background: var(--bg);
+  color: #e5e7eb;
 }
 .container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+/* Container for admin pages - keeps original centered layout */
+.container-admin {
   max-width: 1000px;
   margin: 24px auto;
   padding: 16px;
+}
+/* Make root elements fill viewport height so pages can be full screen */
+html, body, #root {
+  height: 100%;
 }
 .nav {
   display: flex;
@@ -120,4 +142,84 @@ textarea {
   margin-top: 10px;
   font-size: 13px;
   color: #444;
+}
+
+/* Custom animations for enhanced book page */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(147, 51, 234, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Delay classes for staggered animations */
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+.delay-2000 {
+  animation-delay: 2s;
+}
+
+/* Hover effects */
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* Glass effect enhancement */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(147, 51, 234, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #9333ea, #3b82f6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #7c2d12, #1e40af);
 }

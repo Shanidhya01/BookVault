@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -23,10 +23,17 @@ function PrivateRoute({ children, adminOnly }) {
 }
 
 export default function App() {
+  const location = useLocation();
+  const pathname = location.pathname;
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isAdminBooks = pathname.startsWith("/admin/books");
+  // Use centered container for admin pages except /admin/books which should be full width
+  const containerClass = isAdminRoute && !isAdminBooks ? "container-admin" : "container";
+
   return (
     <div>
       <Navbar />
-      <main className="container">
+      <main className={containerClass}>
         <Routes>
           <Route path="/" element={<Books />} />
           <Route path="/login" element={<Login />} />

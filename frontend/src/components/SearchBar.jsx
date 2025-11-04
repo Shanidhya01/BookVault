@@ -2,16 +2,16 @@ import React from "react";
 
 export default function SearchBar({ search, setSearch, category, setCategory, onSearch }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-3 items-center justify-center bg-white/30 backdrop-blur-md border border-purple-200 shadow-md rounded-2xl p-4 transition-all duration-300 hover:shadow-lg">
+    <div className="flex flex-col sm:flex-row gap-3 items-center justify-center bg-white/30 dark:bg-gray-800/30 backdrop-blur-md border border-purple-200 dark:border-purple-700 shadow-md rounded-2xl p-4 transition-all duration-300 hover:shadow-lg">
       <input
-        className="flex-1 w-full sm:w-auto px-4 py-2 rounded-lg border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/60 placeholder-gray-500 text-gray-800 backdrop-blur-sm"
+        className="flex-1 w-full sm:w-auto px-4 py-2 rounded-lg border border-purple-300 dark:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white/60 dark:bg-gray-700/60 placeholder-gray-500 dark:placeholder-gray-400 text-gray-800 dark:text-gray-200 backdrop-blur-sm"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="🔍 Search by title, author, or ISBN..."
       />
 
       <select
-        className="px-4 py-2 rounded-lg border border-purple-300 bg-white/60 text-gray-800 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="px-4 py-2 rounded-lg border border-purple-300 dark:border-purple-600 bg-white/60 dark:bg-gray-700/60 text-gray-800 dark:text-gray-200 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       >

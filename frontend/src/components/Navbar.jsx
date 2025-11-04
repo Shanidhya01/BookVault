@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import ThemeToggle from "./ThemeToggle";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { BookOpen, Menu, X } from "lucide-react"; 
@@ -34,7 +33,6 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6 text-white font-medium">
           <NavLinks user={user} setShowPopup={setShowPopup} />
-          <ThemeToggle />
         </div>
 
         {/* Mobile Menu Button */}
@@ -54,7 +52,6 @@ export default function Navbar() {
             setShowPopup={setShowPopup}
             closeMenu={() => setMenuOpen(false)}
           />
-          <ThemeToggle />
         </div>
       )}
 
